@@ -9,6 +9,129 @@
 #include "gmath.h"
 
 void scanline_convert( struct matrix *points, int i, screen s, zbuffer zb ) {
+  //given point matrix and single point
+  
+  color c;
+  c.red = 0;
+  c.green = 0;
+  c.blue = 255;
+  
+  int top;
+  int mid;
+  int bot;
+  if (points->m[1][i + 1] >= points->m[1][i] && points->m[1][i + 2] >= points->m[1][i]){
+    if (points->m[1][i + 2] >= points->m[1][i + 1]){
+      top = i + 2;
+      mid = i + 1;
+      bot = i;
+    }else{
+      top = i + 1;
+      mid = i + 2;
+      bot = i;
+    }
+  }
+  if (points->m[1][i + 2] >= points->m[1][i + 1] && points->m[1][i] >= points->m[1][i + 1]){
+    if (points->m[1][i + 2] >= points->m[1][i]){
+      top = i + 2;
+      mid = i;
+      bot = i + 1;
+    }else{
+      top = i;
+      mid = i + 2;
+      bot = i + 1;
+    }
+  }
+  if (points->m[1][i + 1] >= points->m[1][i + 1] && points->m[1][i] >= points->m[1][i + 2]){
+    if (points->m[1][i + 1] >= points->m[1][i]){
+      top = i + 1;
+      mid = i;
+      bot = i + 2;
+    }else{
+      top = i;
+      mid = i + 1;
+      bot = i + 2;
+    }
+  }
+
+  double tx = points->m[0][top];
+  double ty = points->m[1][top];
+  double tz = points->m[2][top];
+  double mx = points->m[0][mid];
+  double my = points->m[1][mid];
+  double mz = points->m[2][mid];
+  double bx = points->m[0][bot];
+  double by = points->m[1][bot];
+  double bz = points->m[2][bot];
+  printf("vertices: %f %f %f %f %f %f %f %f %f\n", tx, ty, tz, mx, my, mz, bx, by, bz);
+  
+  double x0;
+  double x1;
+  double dx0;
+  double dx1;
+  double z0;
+  double z1;
+  double dz0;
+  double dz1;
+  
+  x0 = bx;
+  if (ty != by){
+    dx0 = (tx - bx) / (ty - by);
+  }else{
+    dx0 = 1;
+  }
+  //printf("dx0: %f\n", dx0);
+  x1 = bx;
+  
+  //z
+  z0 = bz;
+  if (tz != bz){
+    dz0 = (tz - bz) / (tz - bz);
+  }else{
+    dz0 = 1;
+  }
+  //printf("dz0: %f\n", dz0);
+  z1 = bz;
+  
+  
+  printf("by, ty: %f %f\n", by, ty);
+  for (double y = by; y < ty; y++){
+    if (y < my){
+      if (my != ty){
+        dx1 = (mx - bx) / (my - ty);
+      }else{
+        dx1 = 1;
+      }
+    }else{
+      if (ty != my){
+        dx1 = (tx - mx) / (ty - my);
+      }else{
+        dx1 = 1;
+      }
+    }
+    
+    //z
+    if (y < my){
+      if (mz != tz){
+        dz1 = (mz - bz) / (mz - tz);
+      }else{
+        dz1 = 1;
+      }
+    }else{
+      if (tz != mz){
+        dz1 = (tz - mz) / (tz - mz);
+      }else{
+        dz1 = 1;
+      }
+    }
+    
+    printf("valuesX: %f, %f, %f, %f, %f  ", x0, dx0, x1, dx1, y);
+    printf("valuesZ: %f, %f, %f, %f, %f\n", z0, dz0, z1, dz1, y);
+    draw_line(x0, y, z0, x1, y, z1, s, zb, c);
+    x0 += dx0;
+    x1 += dx1;
+    z0 += dz0;
+    z1 += dz1;
+  }
 }
 
 
@@ -62,12 +185,12 @@ void draw_polygons( struct matrix *polygons, screen s, zbuffer zb, color c ) {
     normal = calculate_normal(polygons, point);
     
     if ( normal[2] > 0 ) {
+      printf("polygon %d\n", point);
+      scanline_convert( polygons, point, s, zb );
+      c.red = 0;
+      c.green = 255;
+      c.blue = 0;
       
-      //printf("polygon %d\n", point);
-      /* scanline_convert( polygons, point, s, zb ); */
-      /* c.red = 0; */
-      /* c.green = 255; */
-      /* c.blue = 0; */
       draw_line( polygons->m[0][point],
       		 polygons->m[1][point],
       		 polygons->m[2][point],
@@ -89,6 +212,7 @@ void draw_polygons( struct matrix *polygons, screen s, zbuffer zb, color c ) {
       		 polygons->m[1][point+2],
       		 polygons->m[2][point+2],
       		 s, zb, c);
+           
        }
   }
 }
@@ -502,9 +626,10 @@ void draw_lines( struct matrix * points, screen s, zbuffer zb, color c) {
 	      points->m[2][point],
 	      points->m[0][point+1],
 	      points->m[1][point+1],
-	      points->m[2][point + 1],
+	      points->m[2][point+1],
 	      s, zb, c);	       
 }// end draw_lines
+
 
 void draw_line(int x0, int y0, double z0,
 	       int x1, int y1, double z1,
