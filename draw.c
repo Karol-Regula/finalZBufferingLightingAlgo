@@ -41,7 +41,7 @@ void scanline_convert( struct matrix *points, int i, screen s, zbuffer zb ) {
       bot = i + 1;
     }
   }
-  if (points->m[1][i + 1] >= points->m[1][i + 1] && points->m[1][i] >= points->m[1][i + 2]){
+  if (points->m[1][i + 1] >= points->m[1][i + 2] && points->m[1][i] >= points->m[1][i + 2]){
     if (points->m[1][i + 1] >= points->m[1][i]){
       top = i + 1;
       mid = i;
@@ -74,53 +74,62 @@ void scanline_convert( struct matrix *points, int i, screen s, zbuffer zb ) {
   double dz1;
   
   x0 = bx;
-  if (ty != by){
-    dx0 = (tx - bx) / (ty - by);
-  }else{
-    dx0 = 1;
-  }
-  //printf("dx0: %f\n", dx0);
+  dx0 = (tx - bx) / (ty - by);
   x1 = bx;
   
   //z
   z0 = bz;
-  if (tz != bz){
-    dz0 = (tz - bz) / (tz - bz);
-  }else{
-    dz0 = 1;
-  }
-  //printf("dz0: %f\n", dz0);
+  dz0 = (tz - bz) / (ty - by);
   z1 = bz;
   
+  c.red = rand() % 256;
+  c.green = rand() % 256;
+  c.blue = rand() % 256;
   
   printf("by, ty: %f %f\n", by, ty);
   for (double y = by; y < ty; y++){
     if (y < my){
-      if (my != ty){
+      if (ty != my){
         dx1 = (mx - bx) / (my - ty);
       }else{
-        dx1 = 1;
+        if (mx > bx){
+          dx1 = 1;
+        }else{
+          dx1 = -1;
+        }
       }
     }else{
       if (ty != my){
         dx1 = (tx - mx) / (ty - my);
       }else{
-        dx1 = 1;
+        if (mx > bx){
+          dx1 = 1;
+        }else{
+          dx1 = -1;
+        }
       }
     }
     
     //z
     if (y < my){
       if (mz != tz){
-        dz1 = (mz - bz) / (mz - tz);
+        dz1 = (mz - bz) / (my - ty);
       }else{
-        dz1 = 1;
+        if (mz > bz){
+          dz1 = 1;
+        }else{
+          dz1 = -1;
+        }
       }
     }else{
-      if (tz != mz){
-        dz1 = (tz - mz) / (tz - mz);
+      if (ty != my){
+        dz1 = (tz - mz) / (ty - my);
       }else{
-        dz1 = 1;
+        if (mz > bz){
+          dz1 = 1;
+        }else{
+          dz1 = -1;
+        }
       }
     }
     
