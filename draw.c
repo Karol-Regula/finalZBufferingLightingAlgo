@@ -62,7 +62,8 @@ void scanline_convert( struct matrix *points, int i, screen s, zbuffer zb ) {
   double bx = points->m[0][bot];
   double by = points->m[1][bot];
   double bz = points->m[2][bot];
-  printf("vertices: %f %f %f %f %f %f %f %f %f\n", tx, ty, tz, mx, my, mz, bx, by, bz);
+  
+  printf("vertices: %f %f %f || %f %f %f || %f %f %f\n", tx, ty, tz, mx, my, mz, bx, by, bz);
   
   double x0;
   double x1;
@@ -75,7 +76,13 @@ void scanline_convert( struct matrix *points, int i, screen s, zbuffer zb ) {
   
   x0 = bx;
   dx0 = (tx - bx) / (ty - by);
-  x1 = bx;
+  
+  double y = by;
+  if (y >= my){
+    x1 = mx;
+  }else{
+    x1 = bx;
+  }
   
   //z
   z0 = bz;
@@ -85,56 +92,43 @@ void scanline_convert( struct matrix *points, int i, screen s, zbuffer zb ) {
   c.red = rand() % 256;
   c.green = rand() % 256;
   c.blue = rand() % 256;
+  //c.red = 100;
+  //c.green = 255;
+  //c.blue = 0;
   
-  printf("by, ty: %f %f\n", by, ty);
-  for (double y = by; y < ty; y++){
+  //printf("by, ty: %f %f\n", by, ty);
+  for (y = by; y < ty; y++){
     if (y < my){
-      if (ty != my){
-        dx1 = (mx - bx) / (my - ty);
+      if (my != by){
+        dx1 = (mx - bx) / (my - by);
       }else{
-        if (mx > bx){
-          dx1 = 1;
-        }else{
-          dx1 = -1;
-        }
+        dx1 = 1;
       }
     }else{
       if (ty != my){
         dx1 = (tx - mx) / (ty - my);
       }else{
-        if (mx > bx){
-          dx1 = 1;
-        }else{
-          dx1 = -1;
-        }
+        dx1 = 1;
       }
     }
     
     //z
     if (y < my){
-      if (mz != tz){
-        dz1 = (mz - bz) / (my - ty);
+      if (my != by){
+        dz1 = (mz - bz) / (my - by);
       }else{
-        if (mz > bz){
-          dz1 = 1;
-        }else{
-          dz1 = -1;
-        }
+        dz1 = 1;
       }
     }else{
       if (ty != my){
         dz1 = (tz - mz) / (ty - my);
       }else{
-        if (mz > bz){
-          dz1 = 1;
-        }else{
-          dz1 = -1;
-        }
+        dz1 = 1;
       }
     }
     
-    printf("valuesX: %f, %f, %f, %f, %f  ", x0, dx0, x1, dx1, y);
-    printf("valuesZ: %f, %f, %f, %f, %f\n", z0, dz0, z1, dz1, y);
+    printf("valuesX: %f %f | %f %f | %f || ", x0, dx0, x1, dx1, y);
+    printf("valuesZ: %f %f | %f %f | %f\n", z0, dz0, z1, dz1, y);
     draw_line(x0, y, z0, x1, y, z1, s, zb, c);
     x0 += dx0;
     x1 += dx1;
