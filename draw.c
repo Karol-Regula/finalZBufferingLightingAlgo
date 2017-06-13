@@ -63,7 +63,7 @@ void scanline_convert( struct matrix *points, int i, screen s, zbuffer zb ) {
   double by = points->m[1][bot];
   double bz = points->m[2][bot];
   
-  printf("vertices: %f %f %f || %f %f %f || %f %f %f\n", tx, ty, tz, mx, my, mz, bx, by, bz);
+  //printf("vertices: %f %f %f || %f %f %f || %f %f %f\n", tx, ty, tz, mx, my, mz, bx, by, bz);
   
   double x0;
   double x1;
@@ -131,8 +131,8 @@ void scanline_convert( struct matrix *points, int i, screen s, zbuffer zb ) {
       }
     }
     
-    printf("valuesX: %f %f | %f %f | %f || ", x0, dx0, x1, dx1, y);
-    printf("valuesZ: %f %f | %f %f | %f\n", z0, dz0, z1, dz1, y);
+    //printf("valuesX: %f %f | %f %f | %f || ", x0, dx0, x1, dx1, y);
+    //printf("valuesZ: %f %f | %f %f | %f\n", z0, dz0, z1, dz1, y);
     draw_line(x0, y, z0, x1, y, z1, s, zb, c);
     x0 += dx0;
     x1 += dx1;
@@ -192,7 +192,7 @@ void draw_polygons( struct matrix *polygons, screen s, zbuffer zb, color c ) {
     normal = calculate_normal(polygons, point);
     
     if ( normal[2] > 0 ) {
-      printf("polygon %d\n", point);
+      //printf("polygon %d\n", point);
       scanline_convert( polygons, point, s, zb );
       c.red = 0;
       c.green = 0;
