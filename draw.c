@@ -87,14 +87,18 @@ void scanline_convert( struct matrix *points, int i, screen s, zbuffer zb ) {
   //z
   z0 = bz;
   dz0 = (tz - bz) / (ty - by);
-  z1 = bz;
+  if (y >= my){
+    z1 = mz;
+  }else{
+    z1 = bz;
+  }
   
-  c.red = rand() % 256;
-  c.green = rand() % 256;
-  c.blue = rand() % 256;
-  //c.red = 100;
-  //c.green = 255;
-  //c.blue = 0;
+  c.red = (int)x0 % 256;
+  c.green = (int)x1 % 256;
+  c.blue = (int)y % 256;
+  // c.red = 100;
+  // c.green = 0;
+  // c.blue = 255;
   
   //printf("by, ty: %f %f\n", by, ty);
   for (y = by; y < ty; y++){
@@ -191,9 +195,9 @@ void draw_polygons( struct matrix *polygons, screen s, zbuffer zb, color c ) {
       printf("polygon %d\n", point);
       scanline_convert( polygons, point, s, zb );
       c.red = 0;
-      c.green = 255;
+      c.green = 0;
       c.blue = 0;
-      
+      /*
       draw_line( polygons->m[0][point],
       		 polygons->m[1][point],
       		 polygons->m[2][point],
@@ -215,7 +219,7 @@ void draw_polygons( struct matrix *polygons, screen s, zbuffer zb, color c ) {
       		 polygons->m[1][point+2],
       		 polygons->m[2][point+2],
       		 s, zb, c);
-           
+           */
        }
   }
 }
